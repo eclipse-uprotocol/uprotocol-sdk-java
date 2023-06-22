@@ -21,6 +21,8 @@
 
 package org.eclipse.uprotocol.cloudevent.factory;
 
+import org.eclipse.uprotocol.cloudevent.datamodel.UCloudEventAttributes;
+import org.eclipse.uprotocol.cloudevent.datamodel.UCloudEventAttributes.Priority;
 import org.eclipse.uprotocol.uuid.factory.UUIDUtils;
 import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -128,6 +130,25 @@ public interface UCloudEvent {
         }
     }
 
+     /**
+     * Extract the UCloudEventExtensions from CloudEvent object. .
+     * @param cloudEvent CloudEvent with token to be extracted.
+     * @return Returns an Optional String value of a CloudEvent priority token if it exists,
+     *      otherwise an Optional.empty() is returned.
+     */
+    static UCloudEventAttributes getUCloudEventAttributes(CloudEvent cloudEvent) {
+        final Optional<String> maybeHash = getHash(cloudEvent);
+        final Optional<Integer> maybettl = getTtl(cloudEvent);
+        final Optional<String> maybeToken = getToken(cloudEvent);
+        
+        return new UCloudEventAttributes.UCloudEventAttributesBuilder()
+        .withHash(maybeHash.orElse(""))
+        .withPriority(Priority.get(getPriority(cloudEvent).orElse(UCloudEventAttributes.Priority.LOW.toString())).orElse(Priority.LOW))
+        .withTtl(maybettl.orElse(0))
+        .withToken(maybeToken.orElse(""))
+        .build();
+    }
+    
     /**
      * Indication of a platform communication error that occurred while trying to deliver the CloudEvent.
      * @param cloudEvent CloudEvent to be queried for a platform delivery error.

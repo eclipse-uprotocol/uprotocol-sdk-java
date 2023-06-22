@@ -121,6 +121,7 @@ public class UUri {
         return uProtocolUri;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
